@@ -109,4 +109,39 @@ Classes that a priori take care of communication with the device from the app in
 - public void setTime_snap(byte[] paramArrayOfbyte)
 - public String toString()
 
+## Procedure to manually modify "connected" SSID/Password
 
+This was tested on an EcoFlow Delta Max, when the Android app would not allow 31-char WPA2 password.
+
+This procedure is based on information from GitHub Issue https://github.com/v1ckxy/ecoflow-withoutflow/issues/2
+
+1. Hold IOT button to enter offline mode
+
+2. Connect to EcoFlow WiFi network with computer
+
+3. (recommended) Fetch existing WiFi config as sanity check
+
+```
+curl -X POST -d '{"action":"getSTA"}' http://192.168.4.1
+```
+
+4. Carefully craft the command to set the new SSID/Password
+
+```
+curl -X POST -d '{"action":"setSTA","data": {"ssid": "SSID_PLACEHOLDER", "psw": "PASSWORD_PLACEHOLDER"}}' http://192.168.4.1/
+```
+
+For example:
+SSID = My Network
+Password = 123abc123ABC
+```
+curl -X POST -d '{"action":"setSTA","data": {"ssid": "My Network", "psw": "123abc123ABC"}}' http://192.168.4.1/
+```
+
+5. (recommended) Fetch applied WiFi config as sanity check
+
+```
+curl -X POST -d '{"action":"getSTA"}' http://192.168.4.1
+```
+
+6. Disconnect from WiFi and reboot EcoFlow, allow it to connect to WiFi online-normally
