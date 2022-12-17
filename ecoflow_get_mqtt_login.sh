@@ -11,6 +11,12 @@
 # Abort if we hit any errors
 set -e
 
+# Set this up because some systems like hassos don't have uuidgen
+function uuidgen {
+  cat /proc/sys/kernel/random/uuid
+}
+
+
 echo "Please provide your normal EcoFlow login information"
 read -p 'User Email: ' uservar
 read -p 'Password:   ' passvar
@@ -48,19 +54,39 @@ echo "Result: code $?"
 echo "-------------------------------------------------------------------------"
 echo "$token_result" | jq .
 echo "-------------------------------------------------------------------------"
+echo ""
 
 # Pull the token value out of the response
 token_value=`echo "$token_result" | jq -r '.data.token'`
-echo ""
-echo "Extracted token:"
-echo "-------------------------------------------------------------------------"
-echo "$token_value"
-echo "-------------------------------------------------------------------------"
-echo "*************************************************************************"
-echo "*  WARNING: Protect this login information as it will allow access to   *"
-echo "*           your account and devices!                                   *"
-echo "*************************************************************************"
-echo ""
+user_id=`echo "$token_result" | jq -r '.data.user.userId'`
+#echo "Extracted token:"
+#echo "-------------------------------------------------------------------------"
+#echo "$token_value"
+#echo "-------------------------------------------------------------------------"
+#echo "*************************************************************************"
+#echo "*  WARNING: Protect this login information as it will allow access to   *"
+#echo "*           your account and devices!                                   *"
+#echo "*************************************************************************"
+#echo ""
+
+if [ "$token_value" == "null" ]; then
+  echo "Error fetching token!"
+	echo ""
+	message=`echo "$token_result" | jq -r '.message'`
+	echo "It might be related to the message \"$message\"."
+	case "$message" in
+		"密码错误")
+			echo "I think this means \"Wrong Password\""
+			;;
+		"请输入有效的电子邮件地址")
+			echo "I think this means \"Please enter a valid email address\""
+			;;
+  esac
+
+  echo ""
+  echo "Script exiting due to error."
+	exit 1
+fi
 
 echo "Sending token certification request to"
 echo "https://api.ecoflow.com/iot-auth/app/certification . . ."
@@ -69,6 +95,7 @@ echo "Result: code $?"
 echo "-------------------------------------------------------------------------"
 echo "$cert_result" | jq .
 echo "-------------------------------------------------------------------------"
+echo ""
 
 # Pull out the useful info
 mqtt_protocol=`echo "$cert_result" | jq -r '.data.protocol'`
@@ -77,7 +104,7 @@ mqtt_port=`echo "$cert_result" | jq -r '.data.port'`
 mqtt_username=`echo "$cert_result" | jq -r '.data.certificateAccount'`
 mqtt_password=`echo "$cert_result" | jq -r '.data.certificatePassword'`
 
-echo ""
+
 echo "Your MQTT client connection information is:"
 echo "#########################################################################"
 echo "#"
@@ -92,35 +119,84 @@ echo "*************************************************************************"
 echo "*  WARNING: Protect this login information as it will allow access to   *"
 echo "*           your account and devices!                                   *"
 echo "*************************************************************************"
-echo ""
 
 echo ""
 echo ""
+echo ""
+
 echo "Now we will figure out your MQTT topic."
 echo ""
-read -p 'Enter EcoFlow Battery Serial Number: ' serial_num
+read -p 'Enter One EcoFlow Battery Serial Number: ' serial_num
 mqtt_topic="/app/device/property/${serial_num}"
+mqtt_writable_topics_prefix="/app/${user_id}/${serial_num}/thing/property"
+
 echo ""
 echo ""
-echo ""
-echo "Your MQTT Topic is:"
-echo "#########################################################################"
-echo "$mqtt_topic"
-echo "#########################################################################"
 echo ""
 
-echo "To subscribe to all messages from a terminal, you could use this command:"
-echo "mosquitto_sub -h \"${mqtt_server}\" -p ${mqtt_port} -u \"${mqtt_username}\" -P \"${mqtt_password}\" -t \"${mqtt_topic}\""
-echo "*************************************************************************"
-echo "*  WARNING: Protect this login information as it will allow access to   *"
-echo "*           your account and devices!                                   *"
-echo "*************************************************************************"
+echo "Your MQTT Topics are:"
+echo "#########################################################################"
+echo "#"
+echo "#  Status Data: $mqtt_topic"
+echo "#  Set:         ${mqtt_writable_topics_prefix}/set"
+echo "#  Get:         ${mqtt_writable_topics_prefix}/get"
+echo "#  Set Reply:   ${mqtt_writable_topics_prefix}/set_reply"
+echo "#  Get Reply:   ${mqtt_writable_topics_prefix}/get_reply"
+echo "#"
+echo "#########################################################################"
+
 echo ""
-echo "For pritty output, to subscribe to all messages from a terminal, you could use this command:"
+echo ""
+echo ""
+
+echo "Mosquitto Broker Bridge Config: (based on HassOS Addon config)"
+echo "#########################################################################"
+echo "#vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"
+echo ""
+echo "# File: /share/mosquitto/bridge_ecoflow.conf"
+echo "#************************************************************************"
+echo "#  WARNING: Protect this login information as it will allow access to   *"
+echo "#           your account and devices!                                   *"
+echo "#************************************************************************"
+echo "connection bridge-ecoflow"
+echo "address ${mqtt_server}:${mqtt_port}"
+echo "remote_username ${mqtt_username}"
+echo "remote_password ${mqtt_password}"
+echo ""
+echo "topic $mqtt_topic in 0 bridge-ecoflow/"
+echo "topic ${mqtt_writable_topics_prefix}/set both 0 bridge-ecoflow/"
+echo "topic ${mqtt_writable_topics_prefix}/get both 0 bridge-ecoflow/"
+echo "topic ${mqtt_writable_topics_prefix}/set_reply both 0 bridge-ecoflow/"
+echo "topic ${mqtt_writable_topics_prefix}/get_reply both 0 bridge-ecoflow/"
+echo ""
+echo "remote_clientid `uuidgen`"
+echo "cleansession true"
+echo "try_private true"
+echo "bridge_insecure false"
+echo "bridge_protocol_version mqttv311"
+echo "bridge_tls_version tlsv1.2"
+echo "bridge_capath /etc/ssl/certs/"
+echo ""
+echo "#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+echo "#########################################################################"
+
+echo ""
+echo ""
+echo ""
+
+echo "To subscribe to status messages from a terminal, you could use this command:"
 echo "mosquitto_sub -h \"${mqtt_server}\" -p ${mqtt_port} -u \"${mqtt_username}\" -P \"${mqtt_password}\" -t \"${mqtt_topic}\" | jq ."
+echo ""
+echo "For monitoring app commands from a terminal, you could use this command:"
+echo "mosquitto_sub -h \"${mqtt_server}\" -p ${mqtt_port} -u \"${mqtt_username}\" -P \"${mqtt_password}\" -t \"${mqtt_writable_topics_prefix}/set\" | jq ."
+echo ""
+echo "For sending control commands from a terminal, you could use this command:"
+echo "message=\"{ the command to send as json }"
+echo "mosquitto_pub -h \"${mqtt_server}\" -p ${mqtt_port} -u \"${mqtt_username}\" -P \"${mqtt_password}\" -t \"${mqtt_writable_topics_prefix}/set\" -m \"\$message\" | jq ."
 echo "*************************************************************************"
 echo "*  WARNING: Protect this login information as it will allow access to   *"
 echo "*           your account and devices!                                   *"
 echo "*************************************************************************"
 
 echo ""
+echo "Done."

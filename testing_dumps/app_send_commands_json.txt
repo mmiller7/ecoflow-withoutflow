@@ -1,0 +1,106 @@
+
+App Idle:
+{"from":"Android","id":"437791021","moduleType":0,"operateType":"TCP","params":{"id":72},"version":"1.0"}
+
+
+
+AC Inverter On:
+{"from":"Android","id":"101671031","moduleType":0,"operateType":"TCP","params":{"id":66,"enabled":1},"version":"1.0"}
+
+AC Inverter Off:
+{"from":"Android","id":"237461032","moduleType":0,"operateType":"TCP","params":{"id":66,"enabled":0},"version":"1.0"}
+
+
+
+12V DC Power Output On:
+{"from":"Android","id":"185801033","moduleType":0,"operateType":"TCP","params":{"id":81,"enabled":1},"version":"1.0"}
+
+12V DC Power Output Off:
+{"from":"Android","id":"324251040","moduleType":0,"operateType":"TCP","params":{"id":81,"enabled":0},"version":"1.0"}
+
+
+
+USB Power On:
+{"from":"Android","id":"496421047","moduleType":0,"operateType":"TCP","params":{"id":34,"enabled":1},"version":"1.0"}
+
+USB Power Off:
+{"from":"Android","id":"137891053","moduleType":0,"operateType":"TCP","params":{"id":34,"enabled":0},"version":"1.0"}
+
+
+
+AC Charge Speed to 1800W:
+{"from":"Android","id":"426881067","moduleType":0,"operateType":"TCP","params":{"slowChgPower":1800,"id":69},"version":"1.0"}
+
+AC Charge Speed to 400W: 
+{"from":"Android","id":"177101077","moduleType":0,"operateType":"TCP","params":{"slowChgPower":400,"id":69},"version":"1.0"}
+
+
+
+Car Input to 4A:
+{"from":"Android","id":"294021086","moduleType":0,"operateType":"TCP","params":{"currMa":4000,"id":71},"version":"1.0"}
+
+Car Input to 8A:
+{"from":"Android","id":"422991092","moduleType":0,"operateType":"TCP","params":{"currMa":8000,"id":71},"version":"1.0"}
+
+
+
+Beeper Off:
+{"from":"Android","id":"501471095","moduleType":0,"operateType":"TCP","params":{"id":38,"enabled":1},"version":"1.0"}
+
+
+Beeper On:
+{"from":"Android","id":"132111102","moduleType":0,"operateType":"TCP","params":{"id":38,"enabled":0},"version":"1.0"}
+
+
+
+Set Charge-Discharge Level 0-100:
+{"from":"Android","id":"296531113","moduleType":0,"operateType":"TCP","params":{"id":51,"minDsgSoc":0},"version":"1.0"}
+{"from":"Android","id":"296561114","moduleType":0,"operateType":"TCP","params":{"maxChgSoc":100,"id":49},"version":"1.0"}
+
+Set Charge-Discharge Level 15-85:
+{"from":"Android","id":"152961128","moduleType":0,"operateType":"TCP","params":{"id":51,"minDsgSoc":15},"version":"1.0"}
+{"from":"Android","id":"152991129","moduleType":0,"operateType":"TCP","params":{"maxChgSoc":85,"id":49},"version":"1.0"}
+
+
+
+Set Smart Generator Auto On-Off 10-90:
+{"from":"Android","id":"394421142","moduleType":0,"operateType":"TCP","params":{"openOilSoc":10,"id":52},"version":"1.0"}
+{"from":"Android","id":"394441143","moduleType":0,"operateType":"TCP","params":{"closeOilSoc":90,"id":53},"version":"1.0"}
+
+Set Smart Generator Auto On-Off to 20-80:
+{"from":"Android","id":"200351159","moduleType":0,"operateType":"TCP","params":{"openOilSoc":20,"id":52},"version":"1.0"}
+{"from":"Android","id":"200381160","moduleType":0,"operateType":"TCP","params":{"closeOilSoc":80,"id":53},"version":"1.0"}
+
+
+
+Set Unit Timeout to 30 minutes:
+{"from":"Android","id":"469161172","moduleType":0,"operateType":"TCP","params":{"id":33,"standByMode":30},"version":"1.0"}
+
+Set Unit Timeout to 12 hours:
+{"from":"Android","id":"197751180","moduleType":0,"operateType":"TCP","params":{"id":33,"standByMode":720},"version":"1.0"}
+
+Set Unit Timeout to Never:
+{"from":"Android","id":"271641188","moduleType":0,"operateType":"TCP","params":{"id":33,"standByMode":0},"version":"1.0"}
+
+
+
+Set Screen Timeout to 10 seconds:
+{"from":"Android","id":"463921195","moduleType":0,"operateType":"TCP","params":{"lcdTime":10,"id":39},"version":"1.0"}
+
+Set Screen Timeout to Never:
+{"from":"Android","id":"136301202","moduleType":0,"operateType":"TCP","params":{"lcdTime":0,"id":39},"version":"1.0"}
+
+Set Screen Timeout to 5 minutes:
+{"from":"Android","id":"178731207","moduleType":0,"operateType":"TCP","params":{"lcdTime":300,"id":39},"version":"1.0"}
+
+
+
+Set AC Timeout to 2 hours:
+{"from":"Android","id":"321411213","moduleType":0,"operateType":"TCP","params":{"standByMins":120,"id":153},"version":"1.0"}
+
+Set AC Timeout to 24 hours:{"from":"Android","id":"462011219","moduleType":0,"operateType":"TCP","params":
+{"standByMins":1440,"id":153},"version":"1.0"}
+
+Set AC Timeout to Never:
+{"from":"Android","id":"140501227","moduleType":0,"operateType":"TCP","params":{"standByMins":0,"id":153},"version":"1.0"}
+
