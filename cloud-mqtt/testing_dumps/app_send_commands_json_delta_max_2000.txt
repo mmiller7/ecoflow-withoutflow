@@ -28,6 +28,15 @@ USB Power Off:
 
 
 
+Enable X-Boost:
+{"from":"Android","id":"155481121","moduleType":0,"operateType":"TCP","params":{"xboost":1,"id":66},"version":"1.0"}
+
+Disable X-Boost:
+{"from":"Android","id":"484001122","moduleType":0,"operateType":"TCP","params":{"xboost":0,"id":66},"version":"1.0"}
+
+
+
+
 AC Charge Speed to 1800W:
 {"from":"Android","id":"426881067","moduleType":0,"operateType":"TCP","params":{"slowChgPower":1800,"id":69},"version":"1.0"}
 
@@ -103,4 +112,3 @@ Set AC Timeout to 24 hours:{"from":"Android","id":"462011219","moduleType":0,"op
 
 Set AC Timeout to Never:
 {"from":"Android","id":"140501227","moduleType":0,"operateType":"TCP","params":{"standByMins":0,"id":153},"version":"1.0"}
-
