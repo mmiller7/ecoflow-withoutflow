@@ -1,0 +1,146 @@
+# Note: I created this based on my Ecoflow Delta Max 2000
+
+# Example card for overall status and control;
+type: vertical-stack
+cards:
+  - type: markdown
+    content: <center><font size="5">Ecoflow Delta Max 2000</font></h3></center>
+  - show_name: true
+    show_icon: true
+    show_state: true
+    type: glance
+    entities:
+      - entity: sensor.ecoflow_soc
+        name: Battery
+      - entity: sensor.ecoflow_temperature
+        name: Temperature
+      - entity: binary_sensor.ecoflow_cooling_fan
+        name: Fans
+      - entity: sensor.ecoflow_total_input_power
+        name: Input
+      - entity: sensor.ecoflow_remaining_charge_discharge
+        name: Time to Full/Empty
+      - entity: sensor.ecoflow_total_output_power
+        name: Output
+    title: System Status
+    state_color: true
+    columns: 3
+  - type: entities
+    entities:
+      - entity: switch.ecoflow_ac_output
+        name: AC Output
+      - entity: switch.ecoflow_12v_dc_output
+        name: 12V DC Output
+      - entity: switch.ecoflow_usb_output
+        name: USB Output
+      - type: divider
+      - entity: switch.ecoflow_x_boost
+    title: Power Control
+    show_header_toggle: false
+	
+	
+	
+	
+	
+	
+	
+	
+	
+# Example card for detailed input/output power:
+type: vertical-stack
+cards:
+  - type: markdown
+    content: <center><font size="5">Ecoflow Delta Max 2000</font></h3></center>
+  - show_name: true
+    show_icon: true
+    show_state: true
+    type: glance
+    entities:
+      - entity: sensor.ecoflow_ac_selected_charge_rate
+        name: AC Mode
+      - entity: sensor.ecoflow_ac_mains_input_voltage
+        name: Volts
+      - entity: sensor.ecoflow_ac_mains_input_current
+        name: Amps
+      - entity: sensor.ecoflow_ac_mains_input_power
+        name: Power
+      - entity: sensor.ecoflow_dc_input_mode
+        name: DC Mode
+      - entity: sensor.ecoflow_dc_input_voltage
+        name: Volts
+      - entity: sensor.ecoflow_dc_input_current
+        name: Amps
+      - entity: sensor.ecoflow_dc_input_power
+        name: Power
+    columns: 4
+    title: Detailed Power Input
+  - show_name: true
+    show_icon: true
+    show_state: true
+    type: glance
+    entities:
+      - entity: binary_sensor.ecoflow_ac_output
+        name: AC Out
+      - entity: sensor.ecoflow_ac_mains_output_voltage
+        name: Volts
+      - entity: sensor.ecoflow_ac_mains_output_current
+        name: Amps
+      - entity: sensor.ecoflow_ac_mains_output_power
+        name: Power
+      - entity: binary_sensor.ecoflow_12v_dc_output
+        name: 12V DC Out
+      - entity: sensor.ecoflow_12v_dc_output_voltage
+        name: Volts
+      - entity: sensor.ecoflow_12v_dc_output_current
+        name: Amps
+      - entity: sensor.ecoflow_12v_dc_output_power
+        name: Power
+      - entity: binary_sensor.ecoflow_usb_output
+        name: USB Out
+      - entity: sensor.ecoflow_usb_a_port_1_output_power
+        name: Port 1
+      - entity: sensor.ecoflow_usb_a_qc_port_1_output_power
+        name: QC Port 1
+      - entity: sensor.ecoflow_usb_c_port_1_output_power
+        name: PD Port 1
+      - entity: binary_sensor.ecoflow_usb_output
+        name: USB Out
+      - entity: sensor.ecoflow_usb_a_port_2_output_power
+        name: Port 2
+      - entity: sensor.ecoflow_usb_a_qc_port_2_output_power
+        name: QC Port 2
+      - entity: sensor.ecoflow_usb_c_port_2_output_power
+        name: PD Port 2
+    columns: 4
+    title: Detailed Power Output
+	
+	
+	
+	
+	
+	
+	
+	
+	
+# Example card for modifying settings:
+type: entities
+entities:
+  - entity: number.ecoflow_discharge_min_limit
+    name: Discharge Min Limit
+  - entity: number.ecoflow_charge_max_limit
+    name: Charge Max Limit
+  - entity: select.ecoflow_ac_custom_charge_rate
+    name: AC Slow-Charge Rate Limit
+  - entity: select.ecoflow_car_charge_current
+  - entity: switch.ecoflow_beeper
+  - entity: number.ecoflow_generator_auto_start_soc_limit
+    name: Generator Start SoC
+  - entity: number.ecoflow_generator_auto_stop_soc_limit
+    name: Generator Stop SoC
+  - entity: select.ecoflow_unit_timeout
+    name: Unit Shutdown Timeout
+  - entity: select.ecoflow_screen_timeout
+    name: Screen Timeout
+  - entity: select.ecoflow_ac_inverter_timeout
+    name: AC Inverter Shutdown Timeout
+title: Ecoflow Delta Max 2000 Configuration

@@ -181,6 +181,15 @@ echo "#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 echo "#########################################################################"
 
 echo ""
+
+echo "To use the Home Assistant YAML MQTT sensors file I built, you will need"
+echo "to *GLOBAL* find and replace the user-ID and serial-number placeholders:"
+echo "#########################################################################"
+echo "# Numerical User-ID:     ${user_id}"
+echo "# Battery Serial-Number: ${serial_num}"
+echo "#########################################################################"
+
+echo ""
 echo ""
 echo ""
 

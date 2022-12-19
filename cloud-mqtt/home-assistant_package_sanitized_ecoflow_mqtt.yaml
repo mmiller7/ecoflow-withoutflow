@@ -1,0 +1,1118 @@
+# Ecoflow Sensor and Control Package File
+#
+# Note: I created this based on my Ecoflow Delta Max 2000
+#
+# Please replace the following placeholder values (global find-replace):
+########################################################################
+# Numerical User-ID:     NUMERICAL_USER_ID_VALUE
+# Battery Serial-Number: BATTERY_SN_VALUE
+########################################################################
+#
+#
+#
+# Expected local MQTT broker bridge config for topics:
+########################################################################
+# topic /app/device/property/BATTERY_SN_VALUE in 0 bridge-ecoflow/
+# topic /app/NUMERICAL_USER_ID_VALUE/BATTERY_SN_VALUE/thing/property/set both 0 bridge-ecoflow/
+# topic /app/NUMERICAL_USER_ID_VALUE/BATTERY_SN_VALUE/thing/property/get both 0 bridge-ecoflow/
+# topic /app/NUMERICAL_USER_ID_VALUE/BATTERY_SN_VALUE/thing/property/set_reply both 0 bridge-ecoflow/
+# topic /app/NUMERICAL_USER_ID_VALUE/BATTERY_SN_VALUE/thing/property/get_reply both 0 bridge-ecoflow/
+########################################################################
+#
+# This file created by Matthew Miller - 19 DEC 2022
+
+
+
+mqtt:
+
+  # Ecoflow MQTT Sensors
+
+  sensor:
+
+    # MQTT Topic Update metadata
+    
+    - name: "Ecoflow Params Last Updated"
+      #icon: "mdi:clock"
+      device_class: timestamp
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      value_template: >-
+        {% set value = value_json['params']['latestTimeStamp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {# Note: as_datetime('str') should not be type int #}
+          {{ (value | int(0) / 1000) | timestamp_local | as_datetime }}
+        {% endif %}
+
+    # Status Sensors
+    
+    - name: "Ecoflow Temperature Raw"
+      device_class: temperature
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Raw C'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.temp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Charge Time"
+      icon: "mdi:battery-clock"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'minutes'
+      value_template: >-
+        {% set value = value_json['params']['ems.chgRemainTime'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | float("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Discharge Time"
+      icon: "mdi:battery-clock-outline"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'minutes'
+      value_template: >-
+        {% set value = value_json['params']['ems.dsgRemainTime'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | float("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow SoC Raw"
+      device_class: battery
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% set value = value_json['params']['ems.f32LcdShowSoc'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | float("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow AC Fast Charge Rate"
+      icon: "mdi:lightning-bolt-circle"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['inv.cfgFastChgWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow LCD Remaining Time"
+      icon: "mdi:battery-clock"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'minutes'
+      value_template: >-
+        {% set value = value_json['params']['pd.remainTime'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | float("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Car Charge Current"
+      # NOTE: This sensor appears to require "polling" on my Delta Max 2000
+      icon: "mdi:car-speed-limiter"
+      device_class: current
+      force_update: true
+      state_topic: "bridge-ecoflow//app/NUMERICAL_USER_ID_VALUE/BATTERY_SN_VALUE/thing/property/set_reply"
+      unit_of_measurement: 'A'
+      value_template: >-
+        {% set valueId = value_json['data']['id'] %}
+        {% set valueData = value_json['data']['data'] %}
+        {% if not valueId   is defined or
+              not valueData is defined or
+              (valueId | int(-1)) != 72   %} 
+          {{ this.state }}
+        {% else %}
+          {{ (valueData | int("invalid") / 1000) | int("invalid") }}
+        {% endif %}
+
+    # Health Sensors
+    
+    - name: "Ecoflow Design Capacity"
+      device_class: energy
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Ah'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.designCap'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    - name: "Ecoflow Full Charge Capacity"
+      device_class: energy
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Ah'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.fullCap'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    - name: "Ecoflow Max Cell Temperature Raw"
+      device_class: temperature
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Raw C'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.maxCellTemp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Min Cell Temperature Raw"
+      device_class: temperature
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Raw C'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.minCellTemp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Max Cell Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.maxCellVol'] %}
+        {% if not value is defined %} 
+          {{ this.state  }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    - name: "Ecoflow Min Cell Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.minCellVol'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    # Config Sensors
+    
+    - name: "Ecoflow Max SoC Limit"
+      device_class: battery
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% set value = value_json['params']['ems.maxChargeSoc'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Min SoC Limit"
+      device_class: battery
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% set value = value_json['params']['ems.minDsgSoc'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Generator Auto-Stop SoC Limit"
+      device_class: battery
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% set value = value_json['params']['ems.maxCloseOilEbSoc'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Generator Auto-Start SoC Limit"
+      device_class: battery
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% set value = value_json['params']['ems.minOpenOilEbSoc'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow AC Custom Charge Rate"
+      icon: "mdi:car-speed-limiter"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['inv.cfgSlowChgWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow AC Inverter Timeout"
+      icon: "mdi:timer-outline"
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Minutes'
+      value_template: >-
+        {% set value = value_json['params']['inv.cfgStandbyMin'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Screen Timeout"
+      icon: "mdi:timer-outline"
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Seconds'
+      value_template: >-
+        {% set value = value_json['params']['pd.lcdOffSec'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Unit Timeout"
+      icon: "mdi:timer-outline"
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Minutes'
+      value_template: >-
+        {% set value = value_json['params']['pd.standByMode'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow AC Mains Input Current"
+      device_class: current
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'A'
+      value_template: >-
+        {% set value = value_json['params']['inv.acInAmp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0}}
+        {% endif %}
+
+    - name: "Ecoflow AC Mains Input Frequency"
+      device_class: frequency
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Hz'
+      value_template: >-
+        {% set value = value_json['params']['inv.acInFreq'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow AC Mains Input Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['inv.acInVol'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    - name: "Ecoflow AC Mains Input Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['inv.inputWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow DC Input Mode"
+      icon: "mdi:connection"
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      value_template: >-
+        {% set value = value_json['params']['mppt.chgType'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% elif value | int("invalid") == 0 %}
+          None
+        {% elif value | int("invalid") == 1 %}
+          Car
+        {% elif value | int("invalid") == 2 %}
+          Solar
+        {% else %}
+          Unknown/Invalid mppt.chgType={{ value | int("invalid") }}
+        {% endif %}
+
+
+    - name: "Ecoflow DC Input Current"
+      icon: "mdi:current-dc"
+      device_class: current
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'A'
+      value_template: >-
+        {% set value = value_json['params']['mppt.inAmp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 100.0}}
+        {% endif %}
+
+    - name: "Ecoflow DC Input Voltage"
+      icon: "mdi:current-dc"
+      device_class: voltage
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['mppt.inVol'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 10.0 }}
+        {% endif %}
+
+    - name: "Ecoflow DC Input Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['mppt.inWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Total Input Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.wattsInSum'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    # Discharge Sensors
+
+    - name: "Ecoflow AC Mains Output Current"
+      device_class: current
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'A'
+      value_template: >-
+        {% set value = value_json['params']['inv.invOutAmp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0}}
+        {% endif %}
+
+    - name: "Ecoflow AC Mains Output Frequency"
+      device_class: frequency
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'Hz'
+      value_template: >-
+        {% set value = value_json['params']['inv.invOutFreq'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow AC Mains Output Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['inv.invOutVol'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    - name: "Ecoflow AC Mains Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['inv.outputWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow 12V DC Output Current"
+      icon: "mdi:current-dc"
+      device_class: current
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'A'
+      value_template: >-
+        {% set value = value_json['params']['mppt.carOutAmp'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 100.0}}
+        {% endif %}
+
+    - name: "Ecoflow 12V DC Output Voltage"
+      icon: "mdi:current-dc"
+      device_class: voltage
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['mppt.carOutVol'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 10.0 }}
+        {% endif %}
+
+    - name: "Ecoflow 12V DC Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['mppt.carOutWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow USB-A QC Port 1 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.qcUsb1Watts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow USB-A QC Port 2 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.qcUsb2Watts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow USB-C Port 1 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.typec1Watts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow USB-C Port 2 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.typec2Watts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow USB-A Port 1 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.usb1Watts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow USB-A Port 2 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.usb2Watts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+    - name: "Ecoflow Total Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['pd.wattsOutSum'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+  binary_sensor:
+
+    # Status Sensors
+    
+    - name: "Ecoflow AC Charge Custom Rate"
+      icon: "mdi:car-speed-limiter"
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['inv.acDipSwitch'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 2 }}
+        {% endif %}
+
+    - name: "Ecoflow X-Boost"
+      icon: "mdi:power-socket-us"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['inv.cfgAcXboost'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 1 }}
+        {% endif %}
+
+    - name: "Ecoflow Cooling Fan"
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      icon: "mdi:fan"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['inv.fanState'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 1 }}
+        {% endif %}
+
+    - name: "Ecoflow Charging"
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      device_class: battery_charging
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['pd.sysChgDsgState'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 2 }}
+        {% endif %}
+
+    # Config Sensors
+
+    - name: "Ecoflow Beeper"
+      icon: "mdi:volume-source"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['pd.beepState'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {# 1=Mute 0=Sound #}
+          {{ value | int("invalid") == 0 }}
+        {% endif %}
+
+    # Output On-Off Sensors
+
+    - name: "Ecoflow AC Output"
+      icon: "mdi:power-socket-us"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['inv.cfgAcEnabled'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 1 }}
+        {% endif %}
+
+    - name: "Ecoflow AC Output On Battery"
+      icon: "mdi:power-socket-us"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['inv.dischargeType'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 1 }}
+        {% endif %}
+
+    - name: "Ecoflow 12V DC Output"
+      icon: "mdi:car-electric"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['mppt.carState'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 1 }}
+        {% endif %}
+
+    - name: "Ecoflow USB Output"
+      icon: "mdi:usb"
+      force_update: true
+      state_topic: "bridge-ecoflow//app/device/property/BATTERY_SN_VALUE"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['pd.dcOutState'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") == 1 }}
+        {% endif %}
+
+
+
+# Templates to handle intermediate data conversions
+
+template:
+
+  - sensor:
+
+      - name: "Ecoflow Temperature"
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ states('sensor.ecoflow_temperature_raw') }}"
+
+      - name: "Ecoflow Max Cell Temperature"
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ states('sensor.ecoflow_max_cell_temperature_raw') }}"
+
+      - name: "Ecoflow Min Cell Temperature"
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ states('sensor.ecoflow_min_cell_temperature_raw') }}"
+
+      - name: "Ecoflow SoC"
+        unit_of_measurement: "%"
+        device_class: battery
+        state: "{{ states('sensor.ecoflow_soc_raw') | float('invalid') | round(2,default='invalid') }}"
+
+      - name: "Ecoflow Input Output"
+        icon: "{{ iif(is_state('binary_sensor.ecoflow_charging','on'),'mdi:battery-arrow-up','mdi:battery-arrow-down-outline') }}"
+        state: "{{ iif(is_state('binary_sensor.ecoflow_charging','on'),'Charging','Discharging') }}"
+
+      - name: "Ecoflow Remaining Charge Discharge"
+        icon: "{{ iif(is_state('binary_sensor.ecoflow_charging','on') or ( states('sensor.ecoflow_total_input_power')|int(-1) > states('sensor.ecoflow_total_output_power')|int(9999) ) , 'mdi:battery-charging-100','mdi:battery-clock-outline') }}"
+        state: >-
+          {% set totalMinutes = states('sensor.ecoflow_lcd_remaining_time') | int(-1) %}
+          {% set totalHours = (totalMinutes/60) | int(-1) %}
+          {% set days = (totalHours/24) | int(-1) %}
+          {% set minutes = (totalMinutes%60) %}
+          {% set hours = (totalHours%24) %}
+          {% if totalMinutes == 5999 %}
+            Max/Idle
+          {% else %}
+            {% if days > 0 %}
+              {{ days }}D
+            {% endif %}
+            {{ 0 if hours<10 }}{{ hours }}:{{ 0 if minutes<10 }}{{ minutes }}
+          {% endif %}
+
+      - name: "Ecoflow AC Selected Charge Rate"
+        unit_of_measurement: "W"
+        device_class: power
+        icon: "{{ iif(is_state('binary_sensor.ecoflow_ac_charge_custom_rate','on'), 'mdi:car-speed-limiter', 'mdi:lightning-bolt-circle') }}"
+        state: "{{ iif(is_state('binary_sensor.ecoflow_ac_charge_custom_rate','on'), states('sensor.ecoflow_ac_custom_charge_rate'), states('sensor.ecoflow_ac_fast_charge_rate')) }}"
+
+
+
+  - number:
+
+      # Configuration
+      
+      - name: "Ecoflow Discharge Min Limit"
+        icon: "mdi:battery-alert-variant-outline"
+        step: 1
+        min: 0
+        max: "{{ states('sensor.ecoflow_max_soc_limit') }}"
+        state: "{{ states('sensor.ecoflow_min_soc_limit') }}"
+        set_value:
+          - service: script.ecoflow_mqtt_set
+            data:
+              params: '{"id":51,"minDsgSoc":{{ value | int(-1) }}}'
+
+      - name: "Ecoflow Charge Max Limit"
+        icon: "mdi:battery-alert-variant"
+        step: 1
+        min: "{{ states('sensor.ecoflow_min_soc_limit') }}"
+        max: 100
+        state: "{{ states('sensor.ecoflow_max_soc_limit') }}"
+        set_value:
+          - service: script.ecoflow_mqtt_set
+            data:
+              params: '{"maxChgSoc":{{ value | int(-1) }},"id":49}'
+       
+      - name: "Ecoflow Generator Auto Start SoC Limit"
+        icon: "mdi:engine"
+        step: 1
+        min: 0
+        max: "{{ states('sensor.ecoflow_generator_auto_stop_soc_limit') }}"
+        state: "{{ states('sensor.ecoflow_generator_auto_start_soc_limit') }}"
+        set_value:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"openOilSoc":{{ value | int(-1) }},"id":52}'
+
+      - name: "Ecoflow Generator Auto Stop SoC Limit"
+        icon: "mdi:engine-off"
+        step: 1
+        min: "{{ states('sensor.ecoflow_generator_auto_start_soc_limit') }}"
+        max: 100
+        state: "{{ states('sensor.ecoflow_generator_auto_stop_soc_limit') }}"
+        set_value:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"closeOilSoc":{{ value | int(-1) }},"id":53}'
+  
+
+
+  - select:
+
+      # Configuration
+
+      - name: "Ecoflow AC Custom Charge Rate"
+        icon: "mdi:car-speed-limiter"
+        state: "{{ states('sensor.ecoflow_ac_custom_charge_rate') }}"
+        options: "{{ [200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800] }}"
+        select_option:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"slowChgPower":{{ option | int(-1) }},"id":69}'
+
+      - name: "Ecoflow Car Charge Current"
+        icon: "mdi:car-speed-limiter"
+        state: "{{ states('sensor.ecoflow_car_charge_current') }}"
+        options: "{{ [4,6,8] }}"
+        select_option:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"currMa":{{ ((option | int(-1)) * 1000) | int(-1) }},"id":71}'
+
+      - name: "Ecoflow Unit Timeout"
+        icon: "mdi:cellphone"
+        state: >-
+          {% set reported = states('sensor.ecoflow_unit_timeout') | int(-1) %}
+          {% if reported == 0 %}
+            Never
+          {% elif reported == 30 %}
+            30 min
+          {% elif reported == 60 %}
+            1 hr
+          {% elif reported == 120 %}
+            2 hr
+          {% elif reported == 360 %}
+            6 hr
+          {% elif reported == 720 %}
+            12 hr
+          {% endif %}
+        options: "{{ ['30 min','1 hr','2 hr','6 hr','12 hr','Never'] }}"
+        select_option:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: >-
+              {% set toSend = -1 %}
+              {% if option == '30 min' %}
+                {% set toSend = 30 %}
+              {% elif option == '1 hr' %}
+                {% set toSend = 60 %}
+              {% elif option == '2 hr' %}
+                {% set toSend = 120 %}
+              {% elif option == '6 hr' %}
+                {% set toSend = 360 %}
+              {% elif option == '12 hr' %}
+                {% set toSend = 720 %}
+              {% elif option == 'Never' %}
+                {% set toSend = 0 %}
+              {% endif %}
+              {"id":33,"standByMode":{{ toSend | int(-1) }}}
+
+      - name: "Ecoflow Screen Timeout"
+        icon: "mdi:tablet"
+        state: >-
+          {% set reported = states('sensor.ecoflow_screen_timeout') | int(-1) %}
+          {% if reported == 0 %}
+            Never
+          {% elif reported == 10 %}
+            10 sec
+          {% elif reported == 30 %}
+            30 sec
+          {% elif reported == 60 %}
+            1 min
+          {% elif reported == 300 %}
+            5 min
+          {% elif reported == 1800 %}
+            30 min
+          {% endif %}
+        options: "{{ ['10 sec','30 sec','1 min','5 min','30 min','Never'] }}"
+        select_option:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: >-
+              {% set toSend = -1 %}
+              {% if option == '10 sec' %}
+                {% set toSend = 10 %}
+              {% elif option == '30 sec' %}
+                {% set toSend = 30 %}
+              {% elif option == '1 min' %}
+                {% set toSend = 60 %}
+              {% elif option == '5 min' %}
+                {% set toSend = 300 %}
+              {% elif option == '30 min' %}
+                {% set toSend = 1800 %}
+              {% elif option == 'Never' %}
+                {% set toSend = 0 %}
+              {% endif %}
+              {"lcdTime":{{ toSend | int(-1) }},"id":39}
+
+
+      - name: "Ecoflow AC Inverter Timeout"
+        icon: "mdi:power-socket-us"
+        state: >-
+          {% set reported = states('sensor.ecoflow_ac_inverter_timeout') | int(-1) %}
+          {% if reported == 0 %}
+            Never
+          {% elif reported == 120 %}
+            2 hr
+          {% elif reported == 240 %}
+            4 hr
+          {% elif reported == 360 %}
+            6 hr
+          {% elif reported == 720 %}
+            12 hr
+          {% elif reported == 1440 %}
+            24 hr
+          {% endif %}
+        options: "{{ ['2 hr','4 hr','6 hr','12 hr','24 hr','Never'] }}"
+        select_option:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: >-
+              {% set toSend = -1 %}
+              {% if option == '2 hr' %}
+                {% set toSend = 120 %}
+              {% elif option == '4 hr' %}
+                {% set toSend = 240 %}
+              {% elif option == '6 hr' %}
+                {% set toSend = 360 %}
+              {% elif option == '12 hr' %}
+                {% set toSend = 720 %}
+              {% elif option == '24 hr' %}
+                {% set toSend = 1440 %}
+              {% elif option == 'Never' %}
+                {% set toSend = 0 %}
+              {% endif %}
+              {"standByMins":{{ toSend | int(-1) }},"id":153}
+
+
+
+# Scripts to send MQTT control commands
+
+script:
+
+  ecoflow_mqtt_set:
+    sequence:
+      service: mqtt.publish
+      data:
+        topic: bridge-ecoflow//app/NUMERICAL_USER_ID_VALUE/BATTERY_SN_VALUE/thing/property/set
+        # Payload accepts a data-parmeter with the specific keys to configure:
+        # ---------------------------------
+        # service: script.ecoflow_mqtt_set
+        # data:
+        #   params: '{"id":66,"enabled":0}'
+        # ---------------------------------
+        payload: >-
+          {"from":"HomeAssistant","id":"{{999900000+(range(10000,99999)|random)}}","moduleType":0,"operateType":"TCP","params":{{params}},"version":"1.0"}
+
+
+
+# Switches to issue commands
+
+switch:
+
+  - platform: template
+
+    switches:
+
+      # Output On/Off switches
+
+      ecoflow_ac_output:
+        friendly_name: "Ecoflow AC Output"
+        icon_template: "mdi:power"
+        value_template: >-
+          {{ is_state('binary_sensor.ecoflow_ac_output','on') }}
+        turn_on:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"id":66,"enabled":1}'
+        turn_off:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"id":66,"enabled":0}'
+
+      ecoflow_12v_dc_output:
+        friendly_name: "Ecoflow 12V DC Output"
+        icon_template: "mdi:power"
+        value_template: >-
+          {{ is_state('binary_sensor.ecoflow_12v_dc_output','on') }}
+        turn_on:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"id":81,"enabled":1}'
+        turn_off:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"id":81,"enabled":0}'
+
+      ecoflow_usb_output:
+        friendly_name: "Ecoflow USB Output"
+        icon_template: "mdi:power"
+        value_template: >-
+          {{ is_state('binary_sensor.ecoflow_usb_output','on') }}
+        turn_on:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"id":34,"enabled":1}'
+        turn_off:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"id":34,"enabled":0}'
+
+      # Configuration
+
+      ecoflow_x_boost:
+        friendly_name: "Ecoflow X-Boost"
+        icon_template: "mdi:power-socket-us"
+        value_template: >-
+          {{ is_state('binary_sensor.ecoflow_x_boost','on') }}
+        turn_on:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"xboost":1,"id":66}'
+        turn_off:
+          service: script.ecoflow_mqtt_set
+          data:
+            params: '{"xboost":0,"id":66}'
+
+      ecoflow_beeper:
+        friendly_name: "Ecoflow Beeper"
+        icon_template: "{{ iif(is_state('binary_sensor.ecoflow_beeper','on'),'mdi:volume-high','mdi:volume-mute') }}"
+        value_template: >-
+          {{ is_state('binary_sensor.ecoflow_beeper','on') }}
+        turn_on:
+          service: script.ecoflow_mqtt_set
+          data:
+          # Remember, this is a "mute" function so 0/1 is swapped
+            params: '{"id":38,"enabled":0}'
+        turn_off:
+          service: script.ecoflow_mqtt_set
+          data:
+            # Remember, this is a "mute" function so 0/1 is swapped
+            params: '{"id":38,"enabled":1}'
+
+
+automation:
+
+  # Automation that polls for Car input current limit
+  - alias: "Ecoflow Poll Car Charge Current"
+    trigger:
+      - platform: homeassistant
+        event: start
+      # This attempts to poll under minimal conditions:
+      # 1) the sensor hasn't already updated for more than 1 minute (polling interval)
+      - platform: template
+        value_template: >-
+          {{ as_timestamp(now()) - as_timestamp(states.sensor.ecoflow_car_charge_current.last_updated) > 60 }}
+      # 2) the battery has reported some statuses since the last time a set-call was made
+      - platform: template
+        value_template: >-
+          {{ as_timestamp(states('sensor.ecoflow_params_last_updated')) > as_timestamp(state_attr('script.ecoflow_mqtt_set','last_triggered')) }}
+        for: "00:00:01"
+    condition:
+      - condition: template
+        # To ensure we don't overwrite data that was just sent out
+        value_template: >-
+          {{ as_timestamp(states('sensor.ecoflow_params_last_updated')) > as_timestamp(state_attr('script.ecoflow_mqtt_set','last_triggered')) }}
+    action:
+      - service: script.ecoflow_mqtt_set
+        data:
+          params: '{"id": 72}'
+
+
+
