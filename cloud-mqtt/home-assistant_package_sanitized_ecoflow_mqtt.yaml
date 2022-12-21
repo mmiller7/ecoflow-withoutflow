@@ -894,9 +894,19 @@ template:
         state: "{{ states('sensor.ecoflow_car_charge_current') }}"
         options: "{{ [4,6,8] }}"
         select_option:
-          service: script.ecoflow_mqtt_set
-          data:
-            params: '{"currMa":{{ ((option | int(-1)) * 1000) | int(-1) }},"id":71}'
+          - service: script.ecoflow_mqtt_set
+            data:
+              params: '{"currMa":{{ ((option | int(-1)) * 1000) | int(-1) }},"id":71}'
+          # Attempt to request update quickly (script will abort if battery has not communicated since set)
+          - delay: 2
+          - service: script.ecoflow_mqtt_set
+            data:
+              params: '{"id": 72}'
+          # Attempt to request update again (script will abort if battery has not communicated since set)
+          - delay: 5
+          - service: script.ecoflow_mqtt_set
+            data:
+              params: '{"id": 72}'
 
       - name: "Ecoflow Unit Timeout"
         icon: "mdi:cellphone"
@@ -1128,15 +1138,10 @@ automation:
       - platform: homeassistant
         event: start
       # This attempts to poll under minimal conditions:
-      # 1) the sensor hasn't already updated for more than 1 minute (polling interval)
+      # The sensor hasn't already updated for more than 1 minute (polling interval)
       - platform: template
         value_template: >-
           {{ as_timestamp(now()) - as_timestamp(states.sensor.ecoflow_car_charge_current.last_updated) > 60 }}
-      # 2) the battery has reported some statuses since the last time a set-call was made
-      - platform: template
-        value_template: >-
-          {{ as_timestamp(states('sensor.ecoflow_params_last_updated')) > as_timestamp(state_attr('script.ecoflow_mqtt_set','last_triggered')) }}
-        for: "00:00:01"
     condition:
       - condition: template
         # To ensure we don't overwrite data that was just sent out
