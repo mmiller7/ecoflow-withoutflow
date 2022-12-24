@@ -133,7 +133,9 @@ entities:
   - entity: select.ecoflow_dm2k_ac_custom_charge_rate
     name: AC Slow-Charge Rate Limit
   - entity: select.ecoflow_dm2k_car_charge_current
+    name: Car Amp Limit
   - entity: switch.ecoflow_dm2k_beeper
+    name: Beeper
   - entity: number.ecoflow_dm2k_generator_auto_start_soc_limit
     name: Generator Start SoC
   - entity: number.ecoflow_dm2k_generator_auto_stop_soc_limit
