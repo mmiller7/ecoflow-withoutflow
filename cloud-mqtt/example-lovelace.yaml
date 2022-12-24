@@ -35,6 +35,7 @@ cards:
         name: USB Output
       - type: divider
       - entity: switch.ecoflow_dm2k_x_boost
+        name: AC X-Boost
     title: Power Control
     show_header_toggle: false
     
