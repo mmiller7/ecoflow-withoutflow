@@ -37,17 +37,15 @@ cards:
       - entity: switch.ecoflow_dm2k_x_boost
     title: Power Control
     show_header_toggle: false
-  - type: entities
-    entities: []
-	
-	
-	
-	
-	
-	
-	
-	
-	
+    
+    
+    
+    
+    
+    
+    
+    
+    
 # Example card for detailed input/output power:
 type: vertical-stack
 cards:
