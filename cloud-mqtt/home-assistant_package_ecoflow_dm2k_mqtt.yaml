@@ -1143,7 +1143,7 @@ automation:
         event: start
       # Infrequent forced poll (safeguard in case something gets stuck)
       - platform: time_pattern
-        minutes: '60'
+        minutes: '00'
       # This attempts to poll under minimal conditions:
       # The sensor hasn't already updated for more than 1 minute (polling interval)
       - platform: template
