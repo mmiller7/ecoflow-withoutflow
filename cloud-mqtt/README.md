@@ -11,7 +11,9 @@ number topics for MQTT subscription.
 The topics and sensors may vary by battery, I have a Delta Max 2000.  The YAML assumes you also
 have a single battery.  If you have multiple, I would suggest you duplicate the YAML package
 once per battery and then modify the names of each sensor (AND where it uses it within the file!)
-so that they are unique to the battery.  Yes, there's a lot of them.
+so that they are unique to the battery.  Yes, there's a lot of them.  I suggest naming YAML filename
+"ecoflow_DEVICE_SHORTNAME_mqtt.yaml" and then do a global find-replace on "DM2K" and "dm2k" for your
+chosen device short-name matching what you did for the MQTT broker friendly short name.
 
 You will also need to create the MQTT Broker addon config file and set it up with the extra
 options under the addon configuration "Customize" as follows:
