@@ -24,6 +24,47 @@
 # 23-DEC-2022
 #   Updated to encapsulate ID/SN into MQTT broker bridge conf
 #   Updated to allow for multiple batteries with unique names
+#   Updated to account for multiple batteries
+#   Designed custom sensors for runtime and charge/discharge
+#   Improved readability and comments
+
+
+
+# List of the "categories" that entities are divided into:
+    # Status - Temperature
+    # Status - Charge Time
+    # Status - Discharge Time
+    # Status - SoC
+    # Status - Availability
+    # Status - Charge Rate
+    # Status - Time
+    # Status - Charge Current
+    # Health - Capacity
+    # Health - MinMax Temperature
+    # Health - MinMax Voltage
+    # Config - Limits
+    # Config - Timeouts
+    # Status - Charge Current
+    # Status - Charge Frequency
+    # Status - Charge Voltage
+    # Status - Charge Power
+    # Status - Charge Mode
+    # Status - Discharge Current
+    # Status - Discharge Frequency
+    # Status - Discharge Voltage
+    # Status - Discharge Power
+    # Status - Output OnOff
+    # Config - Feature
+    # Custom Calculated Status - SoC
+    # Custom Calculated Status - Mode
+    # Custom Calculated Status - Human Readable Time
+    # Status - Human Readable Time
+    # Custom Calculated Status - Charge Power
+    # Custom Calculated Status - Discharge Power
+    # Custom Calculated Status - Charge Mode
+    # Custom Calculated Status - Intermediate Statistics
+    # Config - Scripts
+    # Switch - Output OnOff
 
 
 
@@ -51,6 +92,7 @@ mqtt:
 
     # Status Sensors
     
+    # Status - Temperature
     - name: "Ecoflow DM2K Temperature Raw"
       device_class: temperature
       force_update: true
@@ -64,6 +106,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Temperature
     - name: "Ecoflow DM2K Extra Battery 1 Temperature Raw"
       device_class: temperature
       force_update: true
@@ -81,6 +124,7 @@ mqtt:
           Not Connected
         {% endif %}
 
+    # Status - Temperature
     - name: "Ecoflow DM2K Extra Battery 2 Temperature Raw"
       device_class: temperature
       force_update: true
@@ -98,6 +142,7 @@ mqtt:
           Not Connected
         {% endif %}
 
+    # Status - Charge Time
     - name: "Ecoflow DM2K Charge Time"
       icon: "mdi:battery-clock"
       force_update: true
@@ -111,6 +156,7 @@ mqtt:
           {{ value | float("invalid") }}
         {% endif %}
 
+    # Status - Discharge Time
     - name: "Ecoflow DM2K Discharge Time"
       icon: "mdi:battery-clock-outline"
       force_update: true
@@ -124,6 +170,7 @@ mqtt:
           {{ value | float("invalid") }}
         {% endif %}
 
+    # Status - SoC
     # Combined Batteries SoC
     - name: "Ecoflow DM2K SoC Raw"
       device_class: battery
@@ -138,6 +185,7 @@ mqtt:
           {{ value | float("invalid") }}
         {% endif %}
  
+    # Status - Availability
     - name: "Ecoflow DM2K Available Batteries"
       icon: "mdi:battery-check"
       force_update: true
@@ -150,6 +198,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
  
+    # Status - SoC
     # Master Battery SoC
     - name: "Ecoflow DM2K Internal Battery SoC Raw"
       device_class: battery
@@ -164,6 +213,7 @@ mqtt:
           {{ value | float("invalid") }}
         {% endif %}
 
+    # Status - SoC
     # Extra Battery 1 SoC
     - name: "Ecoflow DM2K Extra Battery 1 SoC Raw"
       device_class: battery
@@ -182,6 +232,7 @@ mqtt:
           Not Connected
         {% endif %}
 
+    # Status - SoC
     # Extra Battery 2 SoC
     - name: "Ecoflow DM2K Extra Battery 2 SoC Raw"
       device_class: battery
@@ -200,6 +251,7 @@ mqtt:
           Not Connected
         {% endif %}
 
+    # Status - Charge Rate
     - name: "Ecoflow DM2K AC Fast Charge Rate"
       icon: "mdi:lightning-bolt-circle"
       device_class: power
@@ -213,6 +265,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Time
     - name: "Ecoflow DM2K LCD Remaining Time"
       icon: "mdi:battery-clock"
       force_update: true
@@ -226,6 +279,7 @@ mqtt:
           {{ value | float("invalid") }}
         {% endif %}
 
+    # Status - Charge Current
     - name: "Ecoflow DM2K Car Charge Current"
       # NOTE: This sensor appears to require "polling" on my Delta Max 2000
       icon: "mdi:car-speed-limiter"
@@ -246,6 +300,7 @@ mqtt:
 
     # Health Sensors
     
+    # Health - Capacity
     - name: "Ecoflow DM2K Design Capacity"
       device_class: energy
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -258,6 +313,7 @@ mqtt:
           {{ value | int("invalid") / 1000.0 }}
         {% endif %}
 
+    # Health - Capacity
     - name: "Ecoflow DM2K Full Charge Capacity"
       device_class: energy
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -270,6 +326,7 @@ mqtt:
           {{ value | int("invalid") / 1000.0 }}
         {% endif %}
 
+    # Health - MinMax Temperature
     - name: "Ecoflow DM2K Max Cell Temperature Raw"
       device_class: temperature
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -282,6 +339,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Health - MinMax Temperature
     - name: "Ecoflow DM2K Min Cell Temperature Raw"
       device_class: temperature
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -294,6 +352,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Health - MinMax Voltage
     - name: "Ecoflow DM2K Max Cell Voltage"
       device_class: voltage
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -306,6 +365,7 @@ mqtt:
           {{ value | int("invalid") / 1000.0 }}
         {% endif %}
 
+    # Health - MinMax Voltage
     - name: "Ecoflow DM2K Min Cell Voltage"
       device_class: voltage
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -320,6 +380,7 @@ mqtt:
 
     # Config Sensors
     
+    # Config - Limits
     - name: "Ecoflow DM2K Max SoC Limit"
       device_class: battery
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -332,6 +393,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Config - Limits
     - name: "Ecoflow DM2K Min SoC Limit"
       device_class: battery
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -344,6 +406,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Config - Limits
     - name: "Ecoflow DM2K Generator Auto-Stop SoC Limit"
       device_class: battery
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -356,6 +419,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Config - Limits
     - name: "Ecoflow DM2K Generator Auto-Start SoC Limit"
       device_class: battery
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -368,6 +432,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Config - Limits
     - name: "Ecoflow DM2K AC Custom Charge Rate"
       icon: "mdi:car-speed-limiter"
       device_class: power
@@ -381,6 +446,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Config - Timeouts
     - name: "Ecoflow DM2K AC Inverter Timeout"
       icon: "mdi:timer-outline"
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -393,6 +459,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Config - Timeouts
     - name: "Ecoflow DM2K Screen Timeout"
       icon: "mdi:timer-outline"
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -405,6 +472,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Config - Timeouts
     - name: "Ecoflow DM2K Unit Timeout"
       icon: "mdi:timer-outline"
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -417,6 +485,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Charge Current
     - name: "Ecoflow DM2K AC Mains Input Current"
       device_class: current
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -429,6 +498,7 @@ mqtt:
           {{ value | int("invalid") / 1000.0}}
         {% endif %}
 
+    # Status - Charge Frequency
     - name: "Ecoflow DM2K AC Mains Input Frequency"
       device_class: frequency
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -441,6 +511,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Charge Voltage
     - name: "Ecoflow DM2K AC Mains Input Voltage"
       device_class: voltage
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -453,6 +524,7 @@ mqtt:
           {{ value | int("invalid") / 1000.0 }}
         {% endif %}
 
+    # Status - Charge Power
     - name: "Ecoflow DM2K AC Mains Input Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -465,6 +537,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Charge Mode
     - name: "Ecoflow DM2K DC Input Mode"
       icon: "mdi:connection"
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -482,7 +555,7 @@ mqtt:
           Unknown/Invalid mppt.chgType={{ value | int("invalid") }}
         {% endif %}
 
-
+    # Status - Charge Current
     - name: "Ecoflow DM2K DC Input Current"
       icon: "mdi:current-dc"
       device_class: current
@@ -496,6 +569,7 @@ mqtt:
           {{ value | int("invalid") / 100.0}}
         {% endif %}
 
+    # Status - Charge Voltage
     - name: "Ecoflow DM2K DC Input Voltage"
       icon: "mdi:current-dc"
       device_class: voltage
@@ -509,6 +583,7 @@ mqtt:
           {{ value | int("invalid") / 10.0 }}
         {% endif %}
 
+    # Status - Charge Power
     - name: "Ecoflow DM2K DC Input Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -521,6 +596,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Charge Power
     - name: "Ecoflow DM2K Total Input Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -533,6 +609,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %} 
 
+    # Status - Charge Power
     - name: "Ecoflow DM2K Extra Battery 1 Input Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -545,6 +622,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Charge Power
     - name: "Ecoflow DM2K Extra Battery 2 Input Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -561,6 +639,7 @@ mqtt:
 
     # Discharge Sensors
 
+    # Status - Discharge Current
     - name: "Ecoflow DM2K AC Mains Output Current"
       device_class: current
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -573,6 +652,7 @@ mqtt:
           {{ value | int("invalid") / 1000.0}}
         {% endif %}
 
+    # Status - Discharge Frequency
     - name: "Ecoflow DM2K AC Mains Output Frequency"
       device_class: frequency
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -585,6 +665,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Voltage
     - name: "Ecoflow DM2K AC Mains Output Voltage"
       device_class: voltage
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -597,6 +678,7 @@ mqtt:
           {{ value | int("invalid") / 1000.0 }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K AC Mains Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -609,6 +691,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Current
     - name: "Ecoflow DM2K 12V DC Output Current"
       icon: "mdi:current-dc"
       device_class: current
@@ -622,6 +705,7 @@ mqtt:
           {{ value | int("invalid") / 100.0}}
         {% endif %}
 
+    # Status - Discharge Voltage
     - name: "Ecoflow DM2K 12V DC Output Voltage"
       icon: "mdi:current-dc"
       device_class: voltage
@@ -635,6 +719,7 @@ mqtt:
           {{ value | int("invalid") / 10.0 }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K 12V DC Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -647,6 +732,7 @@ mqtt:
           {{ value | int("invalid") / 10.0 }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K USB-A QC Port 1 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -659,6 +745,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K USB-A QC Port 2 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -671,6 +758,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K USB-C Port 1 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -683,6 +771,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K USB-C Port 2 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -695,6 +784,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K USB-A Port 1 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -707,6 +797,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K USB-A Port 2 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -719,6 +810,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    # Status - Discharge Power
     - name: "Ecoflow DM2K Total Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -731,6 +823,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
  
+    # Status - Discharge Power
     - name: "Ecoflow DM2K Extra Battery 1 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -743,6 +836,7 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
  
+    # Status - Discharge Power
     - name: "Ecoflow DM2K Extra Battery 2 Output Power"
       device_class: power
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -761,6 +855,7 @@ mqtt:
 
     # Status Sensors
     
+    # Status - Availability
     - name: "Ecoflow DM2K Extra Battery 1 Online"
       state_topic: "bridge-ecoflow/DM2K/data"
       payload_on: True
@@ -773,6 +868,7 @@ mqtt:
           {{ value | int("invalid") > 0 }}
         {% endif %}
 
+    # Status - Availability
     - name: "Ecoflow DM2K Extra Battery 2 Online"
       state_topic: "bridge-ecoflow/DM2K/data"
       payload_on: True
@@ -785,6 +881,7 @@ mqtt:
           {{ value | int("invalid") > 0 }}
         {% endif %}
     
+    # Status - Charge Mode
     - name: "Ecoflow DM2K AC Charge Custom Rate"
       icon: "mdi:car-speed-limiter"
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -798,6 +895,7 @@ mqtt:
           {{ value | int("invalid") == 2 }}
         {% endif %}
 
+    # Status - Output OnOff
     - name: "Ecoflow DM2K X-Boost"
       icon: "mdi:power-socket-us"
       force_update: true
@@ -812,6 +910,7 @@ mqtt:
           {{ value | int("invalid") == 1 }}
         {% endif %}
 
+    # Status - Temperature
     - name: "Ecoflow DM2K Cooling Fan"
       state_topic: "bridge-ecoflow/DM2K/data"
       icon: "mdi:fan"
@@ -825,21 +924,9 @@ mqtt:
           {{ value | int("invalid") == 1 }}
         {% endif %}
 
-    - name: "Ecoflow DM2K Charging"
-      state_topic: "bridge-ecoflow/DM2K/data"
-      device_class: battery_charging
-      payload_on: True
-      payload_off: False
-      value_template: >-
-        {% set value = value_json['params']['pd.sysChgDsgState'] %}
-        {% if not value is defined %} 
-          {{ this.state }}
-        {% else %}
-          {{ value | int("invalid") == 2 }}
-        {% endif %}
-
     # Config Sensors
 
+    # Config - Feature
     - name: "Ecoflow DM2K Beeper"
       icon: "mdi:volume-source"
       force_update: true
@@ -857,6 +944,7 @@ mqtt:
 
     # Output On-Off Sensors
 
+    # Status - Output OnOff
     - name: "Ecoflow DM2K AC Output"
       icon: "mdi:power-socket-us"
       force_update: true
@@ -871,6 +959,7 @@ mqtt:
           {{ value | int("invalid") == 1 }}
         {% endif %}
 
+    # Status - Output OnOff
     - name: "Ecoflow DM2K AC Output On Battery"
       icon: "mdi:power-socket-us"
       force_update: true
@@ -885,6 +974,7 @@ mqtt:
           {{ value | int("invalid") == 1 }}
         {% endif %}
 
+    # Status - Output OnOff
     - name: "Ecoflow DM2K 12V DC Output"
       icon: "mdi:car-electric"
       force_update: true
@@ -899,6 +989,7 @@ mqtt:
           {{ value | int("invalid") == 1 }}
         {% endif %}
 
+    # Status - Output OnOff
     - name: "Ecoflow DM2K USB Output"
       icon: "mdi:usb"
       force_update: true
@@ -921,11 +1012,13 @@ template:
 
   - sensor:
 
+      # Status - Temperature
       - name: "Ecoflow DM2K Temperature"
         unit_of_measurement: "°C"
         device_class: temperature
         state: "{{ states('sensor.ecoflow_dm2k_temperature_raw') }}"
 
+      # Status - Temperature
       - name: "Ecoflow DM2K Extra Battery 1 Temperature"
         unit_of_measurement: "°C"
         device_class: temperature
@@ -936,6 +1029,7 @@ template:
             Not Connected
           {% endif %}
 
+      # Status - Temperature
       - name: "Ecoflow DM2K Extra Battery 2 Temperature"
         unit_of_measurement: "°C"
         device_class: temperature
@@ -946,26 +1040,31 @@ template:
             Not Connected
           {% endif %}
 
+      # Health - MinMax Temperature
       - name: "Ecoflow DM2K Max Cell Temperature"
         unit_of_measurement: "°C"
         device_class: temperature
         state: "{{ states('sensor.ecoflow_dm2k_max_cell_temperature_raw') }}"
 
+      # Health - MinMax Temperature
       - name: "Ecoflow DM2K Min Cell Temperature"
         unit_of_measurement: "°C"
         device_class: temperature
         state: "{{ states('sensor.ecoflow_dm2k_min_cell_temperature_raw') }}"
 
+      # Status - SoC
       - name: "Ecoflow DM2K SoC"
         unit_of_measurement: "%"
         device_class: battery
         state: "{{ states('sensor.ecoflow_dm2k_soc_raw') | float('invalid') | round(2,default='invalid') }}"
 
+      # Status - SoC
       - name: "Ecoflow DM2K Internal Battery SoC"
         unit_of_measurement: "%"
         device_class: battery
         state: "{{ states('sensor.ecoflow_dm2k_internal_battery_soc_raw') | float('invalid') | round(2,default='invalid') }}"
 
+      # Status - SoC
       - name: "Ecoflow DM2K Extra Battery 1 SoC"
         unit_of_measurement: "%"
         device_class: battery
@@ -976,6 +1075,7 @@ template:
             Not Connected
           {% endif %}
 
+      # Status - SoC
       - name: "Ecoflow DM2K Extra Battery 2 SoC"
         unit_of_measurement: "%"
         device_class: battery
@@ -986,29 +1086,89 @@ template:
             Not Connected
           {% endif %}
 
+      # Custom Calculated Status - SoC
       # This is the SoC adjusted for the manually-specified minimum and maximum limits
-      - name: "Ecoflow DM2K Relative Limited SoC"
+      - name: "Ecoflow DM2K Relative Limited SoC Raw"
         unit_of_measurement: "%"
         device_class: battery
         state: >-
           {% set maxSoC = states('sensor.ecoflow_dm2k_max_soc_limit') | int(100) %}
           {% set minSoC = states('sensor.ecoflow_dm2k_min_soc_limit') | int(0) %}
-          {% set currentSoC = states('sensor.ecoflow_dm2k_soc_raw') | int(49) %}
-          {{ (((currentSoC-minSoC) / (maxSoC-minSoC)) * 100) | round(2,default='invalid') }}
+          {% set currentSoC = states('sensor.ecoflow_dm2k_soc_raw') | float(invalid) %}
+          {{ ((currentSoC-minSoC) / (maxSoC-minSoC)) * 100 }}
 
+      # Custom Calculated Status - SoC
+      - name: "Ecoflow DM2K Relative Limited SoC"
+        unit_of_measurement: "%"
+        device_class: battery
+        state: "{{ states('sensor.ecoflow_dm2k_relative_limited_soc_raw') | float('invalid') | round(2,default='invalid') }}"
 
+      # Custom Calculated Status - Mode
       - name: "Ecoflow DM2K Input Output"
-        icon: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_charging','on'),'mdi:battery-arrow-up','mdi:battery-arrow-down-outline') }}"
-        state: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_charging','on'),'Charging','Discharging') }}"
+        icon: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_overall_charging','on'),'mdi:battery-arrow-up','mdi:battery-arrow-down-outline') }}"
+        state: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_overall_charging','on'),'Charging','Discharging') }}"
 
-      - name: "Ecoflow DM2K Remaining Charge Discharge"
-        #icon: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_charging','on') or ( states('sensor.ecoflow_dm2k_total_input_power')|int(-1) > states('sensor.ecoflow_dm2k_total_output_power')|int(9999) ) , 'mdi:battery-charging-100','mdi:battery-clock-outline') }}"
+      # Custom Calculated Status - Time
+      - name: "Ecoflow DM2K Calculated Remaining Time"
+        icon: mdi:battery-clock
+        unit_of_measurement: "minutes"
+        state: >-
+          {% set relativeSoC = states('sensor.ecoflow_dm2k_relative_limited_soc_raw') %}
+          {% set isCalculating = relativeSoC == "Calculating" %}
+          {% set relativeSoC = relativeSoC | float('invalid') %}
+          {% set relativeSoCRateChangeSec = states('sensor.ecoflow_dm2k_battery_relative_limited_soc_rate_change_seconds') | float('invalid') %}
+          {% set relativeSoCRateChangeMin = relativeSoCRateChangeSec * 60 %}
+          {% set isChargingRate = relativeSoCRateChangeSec > 0 %}
+          {% set isChargingSensor = is_state('binary_sensor.ecoflow_dm2k_calculated_rate_trend_charging','on') %}
+          {% if isChargingRate %}{# Charging/Positive #}
+            {{ ((100-relativeSoC) / relativeSoCRateChangeMin) | round(1,default='invalid') }}
+          {% elif not isChargingRate %}{# Discharging/Negative #}
+            {{ (relativeSoC / (-1 * relativeSoCRateChangeMin)) | round(1,default='invalid') }}
+          {% else %}{# Insufficient data #}
+            Calculating
+          {% endif %}
+
+      # Custom Calculated Status - Human Readable Time
+      - name: "Ecoflow DM2K Calculated Remaining Charge Discharge"
         icon: >-
-          {% set relativeSoC = states('sensor.ecoflow_dm2k_relative_limited_soc') %}
-          {% set totalInputPower = states('sensor.ecoflow_dm2k_total_input_power')|int(-1) %}
-          {% set totalOutputPower = states('sensor.ecoflow_dm2k_total_output_power')|int(9999) %}
-          {% if is_state('binary_sensor.ecoflow_dm2k_charging','on') or
-                ( totalInputPower > totalOutputPower ) %}
+          {% set relativeSoC = states('sensor.ecoflow_dm2k_relative_limited_soc')|float('invalid') %}
+          {% if is_state('binary_sensor.ecoflow_dm2k_calculated_rate_trend_charging','on') %}
+            {# Rounded Relative SoC nearest 10 #}
+            {% set rrSoC = relativeSoC | round(-1,default=100) | int(100)  %}
+            {# Cap to 100 max #}
+            {% set rrSoC = [rrSoC,100] | min %}
+            {# Cap to 0 min #}
+            {% set rrSoC = [0,rrSoC] | max %}
+            {% if rrSoC > 0 %}
+              mdi:battery-charging-{{ rrSoC }}
+            {% elif iconPercent == 0 %}
+              mdi:battery-charging-outline
+            {% else %}{# Should never happen, but in case... #}
+              mdi:battery-charging-100
+            {% endif %}
+          {% else %}
+            mdi:battery-clock-outline
+          {% endif %}
+        state: >-
+          {% set totalMinutes = states('sensor.ecoflow_dm2k_calculated_remaining_time') | int(-1) %}
+          {% set totalHours = (totalMinutes/60) | int(-1) %}
+          {% set days = (totalHours/24) | int(-1) %}
+          {% set minutes = (totalMinutes%60) %}
+          {% set hours = (totalHours%24) %}
+          {% if totalMinutes == -1 %}
+            Unavailable
+          {% else %}
+            {% if days > 0 %}
+              {{ days }}D
+            {% endif %}
+            {{ 0 if hours<10 }}{{ hours }}:{{ 0 if minutes<10 }}{{ minutes }}
+          {% endif %}
+
+      # Status - Human Readable Time
+      - name: "Ecoflow DM2K Remaining Charge Discharge"
+        icon: >-
+          {% set relativeSoC = states('sensor.ecoflow_dm2k_relative_limited_soc')|float('invalid') %}
+          {% if is_state('binary_sensor.ecoflow_dm2k_internal_charging','on') %}
             {# Rounded Relative SoC nearest 10 #}
             {% set rrSoC = relativeSoC | round(-1,default=100) | int(100)  %}
             {# Cap to 100 max #}
@@ -1040,17 +1200,20 @@ template:
             {{ 0 if hours<10 }}{{ hours }}:{{ 0 if minutes<10 }}{{ minutes }}
           {% endif %}
 
+      # Status - Charge Rate
       - name: "Ecoflow DM2K AC Selected Charge Rate"
         unit_of_measurement: "W"
         device_class: power
         icon: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_ac_charge_custom_rate','on'), 'mdi:car-speed-limiter', 'mdi:lightning-bolt-circle') }}"
         state: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_ac_charge_custom_rate','on'), states('sensor.ecoflow_dm2k_ac_custom_charge_rate'), states('sensor.ecoflow_dm2k_ac_fast_charge_rate')) }}"
 
+      # Custom Calculated Status - Charge Power
       - name: "Ecoflow DM2K Internal Battery Power"
         unit_of_measurement: "W"
         device_class: power
         state: "{{ (states('sensor.ecoflow_dm2k_total_input_power') | int('invalid') - states('sensor.ecoflow_dm2k_total_output_power') | int('invalid')) }}"
 
+      # Custom Calculated Status - Charge Power
       - name: "Ecoflow DM2K Extra Battery 1 Power"
         unit_of_measurement: "W"
         device_class: power
@@ -1061,6 +1224,7 @@ template:
             0
           {% endif %}
 
+      # Custom Calculated Status - Charge Power
       - name: "Ecoflow DM2K Extra Battery 2 Power"
         unit_of_measurement: "W"
         device_class: power
@@ -1072,6 +1236,7 @@ template:
           {% endif %}
 
 
+      # Custom Calculated Status - Charge Power
       # Adding up the AC+DC inputs - this is NOT the same as the Ecoflow total input
       #                              including power coming from ext. batteries
       - name: "Ecoflow DM2K Total Charge Input Power"
@@ -1082,6 +1247,7 @@ template:
           {% set dcCarSolarInput = states('sensor.ecoflow_dm2k_dc_input_power') | float(0) %}
           {{ acMainsInput + dcCarSolarInput }}
 
+      # Custom Calculated Status - Discharge Power
       # Adding up the AC+DC+USB outputs - this is NOT the same as the Ecoflow total output
       #                                   including power going into ext. batteries
       - name: "Ecoflow DM2K Total Discharge Output Power"
@@ -1100,10 +1266,39 @@ template:
              usbPort1typeQC + usbPort2typeQC + usbPort1typeC + usbPort2typeC }}
 
 
+
+  - binary_sensor:
+
+      # Custom Calculated Status - Charge Mode
+      - name: "Ecoflow DM2K Internal Charging"
+        device_class: battery_charging
+        state: >-
+          {% set totalInput = states('sensor.ecoflow_dm2k_total_input_power') | float(-9999) %}
+          {% set totalOutput = states('sensor.ecoflow_dm2k_total_output_power') | float(9999) %}
+          {{ totalInput > totalOutput }}
+
+      # Custom Calculated Status - Charge Mode
+      - name: "Ecoflow DM2K Overall Charging"
+        device_class: battery_charging
+        state: >-
+          {% set chargingInput = states('sensor.ecoflow_dm2k_total_charge_input_power') | float(-9999) %}
+          {% set dischargeOutput = states('sensor.ecoflow_dm2k_total_discharge_output_power') | float(9999) %}
+          {{ chargingInput > dischargeOutput }}
+
+      # Custom Calculated Status - Charge Mode
+      - name: "Ecoflow DM2K Calculated Rate Trend Charging"
+        device_class: battery_charging
+        state: >-
+          {{ states('sensor.ecoflow_dm2k_battery_relative_limited_soc_rate_change_seconds') | float(0) > 0 }}
+
+
+
+
   - number:
 
       # Configuration
-      
+
+      # Config - Limits
       - name: "Ecoflow DM2K Discharge Min Limit"
         icon: "mdi:battery-alert-variant-outline"
         step: 1
@@ -1115,6 +1310,7 @@ template:
             data:
               params: '{"id":51,"minDsgSoc":{{ value | int(-1) }}}'
 
+      # Config - Limits
       - name: "Ecoflow DM2K Charge Max Limit"
         icon: "mdi:battery-alert-variant"
         step: 1
@@ -1126,6 +1322,7 @@ template:
             data:
               params: '{"maxChgSoc":{{ value | int(-1) }},"id":49}'
        
+      # Config - Limits
       - name: "Ecoflow DM2K Generator Auto Start SoC Limit"
         icon: "mdi:engine"
         step: 1
@@ -1137,6 +1334,7 @@ template:
           data:
             params: '{"openOilSoc":{{ value | int(-1) }},"id":52}'
 
+      # Config - Limits
       - name: "Ecoflow DM2K Generator Auto Stop SoC Limit"
         icon: "mdi:engine-off"
         step: 1
@@ -1154,6 +1352,7 @@ template:
 
       # Configuration
 
+      # Config - Limits
       - name: "Ecoflow DM2K AC Custom Charge Rate"
         icon: "mdi:car-speed-limiter"
         state: "{{ states('sensor.ecoflow_dm2k_ac_custom_charge_rate') }}"
@@ -1163,6 +1362,7 @@ template:
           data:
             params: '{"slowChgPower":{{ option | int(-1) }},"id":69}'
 
+      # Config - Limits
       - name: "Ecoflow DM2K Car Charge Current"
         icon: "mdi:car-speed-limiter"
         state: "{{ states('sensor.ecoflow_dm2k_car_charge_current') }}"
@@ -1182,6 +1382,7 @@ template:
             data:
               params: '{"id": 72}'
 
+      # Config - Timeouts
       - name: "Ecoflow DM2K Unit Timeout"
         icon: "mdi:cellphone"
         state: >-
@@ -1220,6 +1421,7 @@ template:
               {% endif %}
               {"id":33,"standByMode":{{ toSend | int(-1) }}}
 
+      # Config - Timeouts
       - name: "Ecoflow DM2K Screen Timeout"
         icon: "mdi:tablet"
         state: >-
@@ -1259,6 +1461,7 @@ template:
               {"lcdTime":{{ toSend | int(-1) }},"id":39}
 
 
+      # Config - Timeouts
       - name: "Ecoflow DM2K AC Inverter Timeout"
         icon: "mdi:power-socket-us"
         state: >-
@@ -1298,11 +1501,25 @@ template:
               {"standByMins":{{ toSend | int(-1) }},"id":153}
 
 
+sensor:
+
+  # Custom Calculated Status - Intermediate Statistics
+  # Statistics to calculate better rate of charge/discharge
+  - platform: statistics
+    name: "Ecoflow DM2K Battery Relative Limited SoC Rate Change Seconds"
+    entity_id: sensor.ecoflow_dm2k_relative_limited_soc_raw
+    state_characteristic: change_second
+    precision: 20
+    max_age:
+      minutes: 5
+
+
 
 # Scripts to send MQTT control commands
 
 script:
 
+  # Config - Scripts
   ecoflow_dm2k_mqtt_set:
     sequence:
       service: mqtt.publish
@@ -1329,6 +1546,7 @@ switch:
 
       # Output On/Off switches
 
+      # Switch - Output OnOff
       ecoflow_dm2k_ac_output:
         friendly_name: "Ecoflow DM2K AC Output"
         icon_template: "mdi:power"
@@ -1343,6 +1561,7 @@ switch:
           data:
             params: '{"id":66,"enabled":0}'
 
+      # Switch - Output OnOff
       ecoflow_dm2k_12v_dc_output:
         friendly_name: "Ecoflow DM2K 12V DC Output"
         icon_template: "mdi:power"
@@ -1357,6 +1576,7 @@ switch:
           data:
             params: '{"id":81,"enabled":0}'
 
+      # Switch - Output OnOff
       ecoflow_dm2k_usb_output:
         friendly_name: "Ecoflow DM2K USB Output"
         icon_template: "mdi:power"
@@ -1373,6 +1593,7 @@ switch:
 
       # Configuration
 
+      # Config - Feature
       ecoflow_dm2k_x_boost:
         friendly_name: "Ecoflow DM2K X-Boost"
         icon_template: "mdi:power-socket-us"
@@ -1387,6 +1608,7 @@ switch:
           data:
             params: '{"xboost":0,"id":66}'
 
+      # Config - Feature
       ecoflow_dm2k_beeper:
         friendly_name: "Ecoflow DM2K Beeper"
         icon_template: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_beeper','on'),'mdi:volume-high','mdi:volume-mute') }}"
@@ -1404,8 +1626,10 @@ switch:
             params: '{"id":38,"enabled":1}'
 
 
+
 automation:
 
+  # Config - Scripts
   # Automation that polls for Car input current limit
   - alias: "Ecoflow DM2K Poll Car Charge Current"
     trigger:
