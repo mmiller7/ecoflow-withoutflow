@@ -64,6 +64,40 @@ mqtt:
           {{ value | int("invalid") }}
         {% endif %}
 
+    - name: "Ecoflow DM2K Extra Battery 1 Temperature Raw"
+      device_class: temperature
+      force_update: true
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'Raw C'
+      value_template: >-
+        {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_1_online',"on") %}
+          {% set value = value_json['params']['bmsSlave1.temp'] %}
+          {% if not value is defined %} 
+            {{ this.state }}
+          {% else %}
+            {{ value | int("invalid") }}
+          {% endif %}
+        {% else %}
+          Not Connected
+        {% endif %}
+
+    - name: "Ecoflow DM2K Extra Battery 2 Temperature Raw"
+      device_class: temperature
+      force_update: true
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'Raw C'
+      value_template: >-
+        {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_2_online',"on") %}
+          {% set value = value_json['params']['bmsSlave2.temp'] %}
+          {% if not value is defined %} 
+            {{ this.state }}
+          {% else %}
+            {{ value | int("invalid") }}
+          {% endif %}
+        {% else %}
+          Not Connected
+        {% endif %}
+
     - name: "Ecoflow DM2K Charge Time"
       icon: "mdi:battery-clock"
       force_update: true
@@ -90,6 +124,7 @@ mqtt:
           {{ value | float("invalid") }}
         {% endif %}
 
+    # Combined Batteries SoC
     - name: "Ecoflow DM2K SoC Raw"
       device_class: battery
       force_update: true
@@ -101,6 +136,68 @@ mqtt:
           {{ this.state }}
         {% else %}
           {{ value | float("invalid") }}
+        {% endif %}
+ 
+    - name: "Ecoflow DM2K Available Batteries"
+      icon: "mdi:battery-check"
+      force_update: true
+      state_topic: "bridge-ecoflow/DM2K/data"
+      value_template: >-
+        {% set value = value_json['params']['ems.maxAvailableNum'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+ 
+    # Master Battery SoC
+    - name: "Ecoflow DM2K Internal Battery SoC Raw"
+      device_class: battery
+      force_update: true
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.f32ShowSoc'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | float("invalid") }}
+        {% endif %}
+
+    # Extra Battery 1 SoC
+    - name: "Ecoflow DM2K Extra Battery 1 SoC Raw"
+      device_class: battery
+      force_update: true
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_1_online',"on") %}
+          {% set value = value_json['params']['bmsSlave1.f32ShowSoc'] %}
+          {% if not value is defined %} 
+            {{ this.state }}
+          {% else %}
+            {{ value | float("invalid") }}
+          {% endif %}
+        {% else %}
+          Not Connected
+        {% endif %}
+
+    # Extra Battery 2 SoC
+    - name: "Ecoflow DM2K Extra Battery 2 SoC Raw"
+      device_class: battery
+      force_update: true
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: '%'
+      value_template: >-
+        {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_2_online',"on") %}
+          {% set value = value_json['params']['bmsSlave1.f32ShowSoc'] %}
+          {% if not value is defined %} 
+            {{ this.state }}
+          {% else %}
+            {{ value | float("invalid") }}
+          {% endif %}
+        {% else %}
+          Not Connected
         {% endif %}
 
     - name: "Ecoflow DM2K AC Fast Charge Rate"
@@ -434,7 +531,33 @@ mqtt:
           {{ this.state }}
         {% else %}
           {{ value | int("invalid") }}
+        {% endif %} 
+
+    - name: "Ecoflow DM2K Extra Battery 1 Input Power"
+      device_class: power
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave1.inputWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
         {% endif %}
+
+    - name: "Ecoflow DM2K Extra Battery 2 Input Power"
+      device_class: power
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave2.inputWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+
 
     # Discharge Sensors
 
@@ -521,7 +644,7 @@ mqtt:
         {% if not value is defined %} 
           {{ this.state }}
         {% else %}
-          {{ value | int("invalid") }}
+          {{ value | int("invalid") / 10.0 }}
         {% endif %}
 
     - name: "Ecoflow DM2K USB-A QC Port 1 Output Power"
@@ -607,10 +730,60 @@ mqtt:
         {% else %}
           {{ value | int("invalid") }}
         {% endif %}
+ 
+    - name: "Ecoflow DM2K Extra Battery 1 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave1.outputWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+ 
+    - name: "Ecoflow DM2K Extra Battery 2 Output Power"
+      device_class: power
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'W'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave2.outputWatts'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") }}
+        {% endif %}
+
+
 
   binary_sensor:
 
     # Status Sensors
+    
+    - name: "Ecoflow DM2K Extra Battery 1 Online"
+      state_topic: "bridge-ecoflow/DM2K/data"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['ems.bms1Online'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") > 0 }}
+        {% endif %}
+
+    - name: "Ecoflow DM2K Extra Battery 2 Online"
+      state_topic: "bridge-ecoflow/DM2K/data"
+      payload_on: True
+      payload_off: False
+      value_template: >-
+        {% set value = value_json['params']['ems.bms2Online'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") > 0 }}
+        {% endif %}
     
     - name: "Ecoflow DM2K AC Charge Custom Rate"
       icon: "mdi:car-speed-limiter"
@@ -753,6 +926,26 @@ template:
         device_class: temperature
         state: "{{ states('sensor.ecoflow_dm2k_temperature_raw') }}"
 
+      - name: "Ecoflow DM2K Extra Battery 1 Temperature"
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: >-
+          {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_1_online',"on") %}
+            {{ states('sensor.ecoflow_dm2k_extra_battery_1_temperature_raw') }}
+          {% else %}
+            Not Connected
+          {% endif %}
+
+      - name: "Ecoflow DM2K Extra Battery 2 Temperature"
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: >-
+          {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_2_online',"on") %}
+            {{ states('sensor.ecoflow_dm2k_extra_battery_2_temperature_raw') }}
+          {% else %}
+            Not Connected
+          {% endif %}
+
       - name: "Ecoflow DM2K Max Cell Temperature"
         unit_of_measurement: "°C"
         device_class: temperature
@@ -767,6 +960,31 @@ template:
         unit_of_measurement: "%"
         device_class: battery
         state: "{{ states('sensor.ecoflow_dm2k_soc_raw') | float('invalid') | round(2,default='invalid') }}"
+
+      - name: "Ecoflow DM2K Internal Battery SoC"
+        unit_of_measurement: "%"
+        device_class: battery
+        state: "{{ states('sensor.ecoflow_dm2k_internal_battery_soc_raw') | float('invalid') | round(2,default='invalid') }}"
+
+      - name: "Ecoflow DM2K Extra Battery 1 SoC"
+        unit_of_measurement: "%"
+        device_class: battery
+        state: >-
+          {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_1_online',"on") %}
+            {{ states('sensor.ecoflow_dm2k_extra_battery_1_soc_raw') | float('invalid') | round(2,default='invalid') }}
+          {% else %}
+            Not Connected
+          {% endif %}
+
+      - name: "Ecoflow DM2K Extra Battery 2 SoC"
+        unit_of_measurement: "%"
+        device_class: battery
+        state: >-
+          {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_2_online',"on") %}
+            {{ states('sensor.ecoflow_dm2k_extra_battery_2_soc_raw') | float('invalid') | round(2,default='invalid') }}
+          {% else %}
+            Not Connected
+          {% endif %}
 
       # This is the SoC adjusted for the manually-specified minimum and maximum limits
       - name: "Ecoflow DM2K Relative Limited SoC"
@@ -828,6 +1046,58 @@ template:
         icon: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_ac_charge_custom_rate','on'), 'mdi:car-speed-limiter', 'mdi:lightning-bolt-circle') }}"
         state: "{{ iif(is_state('binary_sensor.ecoflow_dm2k_ac_charge_custom_rate','on'), states('sensor.ecoflow_dm2k_ac_custom_charge_rate'), states('sensor.ecoflow_dm2k_ac_fast_charge_rate')) }}"
 
+      - name: "Ecoflow DM2K Internal Battery Power"
+        unit_of_measurement: "W"
+        device_class: power
+        state: "{{ (states('sensor.ecoflow_dm2k_total_input_power') | int('invalid') - states('sensor.ecoflow_dm2k_total_output_power') | int('invalid')) }}"
+
+      - name: "Ecoflow DM2K Extra Battery 1 Power"
+        unit_of_measurement: "W"
+        device_class: power
+        state: >-
+          {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_1_online',"on") %}
+            {{ (states('sensor.ecoflow_dm2k_extra_battery_1_input_power') | int('invalid') - states('sensor.ecoflow_dm2k_extra_battery_1_output_power') | int('invalid')) }}
+          {% else %}
+            0
+          {% endif %}
+
+      - name: "Ecoflow DM2K Extra Battery 2 Power"
+        unit_of_measurement: "W"
+        device_class: power
+        state: >-
+          {% if is_state('binary_sensor.ecoflow_dm2k_extra_battery_2_online',"on") %}
+            {{ (states('sensor.ecoflow_dm2k_extra_battery_2_input_power') | int('invalid') - states('sensor.ecoflow_dm2k_extra_battery_2_output_power') | int('invalid')) }}
+          {% else %}
+            0
+          {% endif %}
+
+
+      # Adding up the AC+DC inputs - this is NOT the same as the Ecoflow total input
+      #                              including power coming from ext. batteries
+      - name: "Ecoflow DM2K Total Charge Input Power"
+        unit_of_measurement: "W"
+        device_class: power
+        state: >-
+          {% set acMainsInput = states('sensor.ecoflow_dm2k_ac_mains_input_power') | float(0) %}
+          {% set dcCarSolarInput = states('sensor.ecoflow_dm2k_dc_input_power') | float(0) %}
+          {{ acMainsInput + dcCarSolarInput }}
+
+      # Adding up the AC+DC+USB outputs - this is NOT the same as the Ecoflow total output
+      #                                   including power going into ext. batteries
+      - name: "Ecoflow DM2K Total Discharge Output Power"
+        unit_of_measurement: "W"
+        device_class: power
+        state: >-
+          {% set acMainsOutput = states('sensor.ecoflow_dm2k_ac_mains_output_power') | float(0) %}
+          {% set dc12vOutput = states('sensor.ecoflow_dm2k_12v_dc_output_power') | float(0) %}
+          {% set usbPort1typeA = states('sensor.ecoflow_dm2k_usb_a_port_1_output_power') | float(0) %}
+          {% set usbPort2typeA = states('sensor.ecoflow_dm2k_usb_a_port_2_output_power') | float(0) %}
+          {% set usbPort1typeQC = states('sensor.ecoflow_dm2k_usb_a_qc_port_1_output_power') | float(0) %}
+          {% set usbPort2typeQC = states('sensor.ecoflow_dm2k_usb_a_qc_port_2_output_power') | float(0) %}
+          {% set usbPort1typeC = states('sensor.ecoflow_dm2k_usb_c_port_1_output_power') | float(0) %}
+          {% set usbPort2typeC = states('sensor.ecoflow_dm2k_usb_c_port_2_output_power') | float(0) %}
+          {{ acMainsOutput + dc12vOutput + usbPort1typeA + usbPort2typeA +
+             usbPort1typeQC + usbPort2typeQC + usbPort1typeC + usbPort2typeC }}
 
 
   - number:
