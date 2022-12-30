@@ -24,7 +24,7 @@
 # 23-DEC-2022
 #   Updated to encapsulate ID/SN into MQTT broker bridge conf
 #   Updated to allow for multiple batteries with unique names
-#   Updated to account for multiple batteries
+#   Updated to account for external batteries
 #   Designed custom sensors for runtime and charge/discharge
 #   Improved readability and comments
 

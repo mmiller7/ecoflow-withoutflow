@@ -130,7 +130,7 @@ read -p 'Enter ONE EcoFlow Battery Serial Number: ' serial_num
 read -p 'Enter a short-name (e.g. DM2K) unit:     ' short_name
 mqtt_topic="/app/device/property/${serial_num}"
 mqtt_writable_topics_prefix="/app/${user_id}/${serial_num}/thing/property"
-friendly_prefix="bridge_ecoflow/${short_name}"
+friendly_prefix="bridge-ecoflow/${short_name}"
 
 echo ""
 echo ""
