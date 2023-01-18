@@ -1141,7 +1141,7 @@ template:
             {% set rrSoC = [0,rrSoC] | max %}
             {% if rrSoC > 0 %}
               mdi:battery-charging-{{ rrSoC }}
-            {% elif iconPercent == 0 %}
+            {% elif rrSoC == 0 %}
               mdi:battery-charging-outline
             {% else %}{# Should never happen, but in case... #}
               mdi:battery-charging-100
