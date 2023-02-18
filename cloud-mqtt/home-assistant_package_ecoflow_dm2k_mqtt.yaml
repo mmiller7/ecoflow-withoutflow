@@ -27,6 +27,9 @@
 #   Updated to account for external batteries
 #   Designed custom sensors for runtime and charge/discharge
 #   Improved readability and comments
+# 18-FEB-2022
+#   Added main-unit and extra-battery voltage health sensor
+#   Added min/max voltage health sensors for extra battery
 
 
 
@@ -353,6 +356,19 @@ mqtt:
         {% endif %}
 
     # Health - MinMax Voltage
+    - name: "Ecoflow DM2K Pack Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsMaster.vol'] %}
+        {% if not value is defined %} 
+          {{ this.state  }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    # Health - MinMax Voltage
     - name: "Ecoflow DM2K Max Cell Voltage"
       device_class: voltage
       state_topic: "bridge-ecoflow/DM2K/data"
@@ -372,6 +388,85 @@ mqtt:
       unit_of_measurement: 'V'
       value_template: >-
         {% set value = value_json['params']['bmsMaster.minCellVol'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    # Health - MinMax Voltage
+    - name: "Ecoflow DM2K Extra Battery 1 Pack Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave1.vol'] %}
+        {% if not value is defined %} 
+          {{ this.state  }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    # Health - MinMax Voltage
+    - name: "Ecoflow DM2K Extra Battery 1 Max Cell Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave1.maxCellVol'] %}
+        {% if not value is defined %} 
+          {{ this.state  }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    # Health - MinMax Voltage
+    - name: "Ecoflow DM2K Extra Battery 1 Min Cell Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave1.minCellVol'] %}
+        {% if not value is defined %} 
+          {{ this.state }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    # Health - MinMax Voltage
+    - name: "Ecoflow DM2K Extra Battery 2 Pack Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave2.vol'] %}
+        {% if not value is defined %} 
+          {{ this.state  }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+
+    # Health - MinMax Voltage
+    - name: "Ecoflow DM2K Extra Battery 2 Max Cell Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave2.maxCellVol'] %}
+        {% if not value is defined %} 
+          {{ this.state  }}
+        {% else %}
+          {{ value | int("invalid") / 1000.0 }}
+        {% endif %}
+
+    # Health - MinMax Voltage
+    - name: "Ecoflow DM2K Extra Battery 2 Min Cell Voltage"
+      device_class: voltage
+      state_topic: "bridge-ecoflow/DM2K/data"
+      unit_of_measurement: 'V'
+      value_template: >-
+        {% set value = value_json['params']['bmsSlave2.minCellVol'] %}
         {% if not value is defined %} 
           {{ this.state }}
         {% else %}
