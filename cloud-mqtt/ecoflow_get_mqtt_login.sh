@@ -16,6 +16,12 @@ function uuidgen {
   cat /proc/sys/kernel/random/uuid
 }
 
+# Generate Ecoflow-compatible random client ID
+# NOTE: Must be called *AFTER* fetching login data
+function mqtt_client_id_gen {
+  echo "ANDROID_`uuidgen | tr '[:lower:]' '[:upper:]'`_${user_id}"
+}
+
 
 echo "Please provide your normal EcoFlow login information"
 read -p 'User Email: ' uservar
@@ -114,6 +120,11 @@ echo "#  Port:     ${mqtt_port}"
 echo "#  Username: ${mqtt_username}"
 echo "#  Password: ${mqtt_password}"
 echo "#"
+echo "#  A few valid unique client IDs for your account different MQTT clients:"
+echo "#  `mqtt_client_id_gen`"
+echo "#  `mqtt_client_id_gen`"
+echo "#  `mqtt_client_id_gen`"
+echo "#"
 echo "#########################################################################"
 echo "*************************************************************************"
 echo "*  WARNING: Protect this login information as it will allow access to   *"
@@ -172,7 +183,7 @@ echo "topic \"\" both 0 ${friendly_prefix}/get  ${mqtt_writable_topics_prefix}/g
 echo "topic \"\" in   0 ${friendly_prefix}/data ${mqtt_writable_topics_prefix}/set_reply"
 echo "topic \"\" in   0 ${friendly_prefix}/data ${mqtt_writable_topics_prefix}/get_reply"
 echo ""
-echo "remote_clientid `uuidgen`"
+echo "remote_clientid `mqtt_client_id_gen`"
 echo "cleansession true"
 echo "try_private true"
 echo "bridge_insecure false"
