@@ -87,6 +87,9 @@ if [ "$token_value" == "null" ]; then
 		"请输入有效的电子邮件地址")
 			echo "I think this means \"Please enter a valid email address\""
 			;;
+       		"账号/密码错误，请重新输入")
+      			echo "The account/password is wrong, please re-enter it."
+      			;;
   esac
 
   echo ""
